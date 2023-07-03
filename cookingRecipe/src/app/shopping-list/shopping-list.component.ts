@@ -9,11 +9,14 @@ import { LoggingService } from '../loging.service';
   templateUrl: './shopping-list.component.html',
   styleUrls: ['./shopping-list.component.css'],
 })
-export class ShoppingListComponent implements OnInit ,OnDestroy {
+export class ShoppingListComponent implements OnInit, OnDestroy {
   ingredients: Ingredient[];
-  private igChangeSub : Subscription;
+  private igChangeSub: Subscription;
 
-  constructor(private shoppingService: ShoppingListService ,private loggingService:LoggingService) {}
+  constructor(
+    private shoppingService: ShoppingListService,
+    private loggingService: LoggingService
+  ) {}
 
   ngOnInit() {
     this.ingredients = this.shoppingService.getIngredients();
@@ -29,6 +32,6 @@ export class ShoppingListComponent implements OnInit ,OnDestroy {
     this.shoppingService.startedEditing.next(index);
   }
   ngOnDestroy(): void {
-      this.igChangeSub.unsubscribe();
+    this.igChangeSub.unsubscribe();
   }
 }
