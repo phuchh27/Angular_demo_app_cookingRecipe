@@ -1,8 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Ingredient } from '../../models/ingredient.model';
-import { ShoppingListService } from 'src/services/shopping-list.service';
+
 import { LoggingService } from '../loging.service';
+import { Store } from '@ngrx/store';
+
+import * as ShoppingListActions from '../shopping-list/store/shopping-list.actions';
+import * as fromApp from '../store/app.reducer'
+
 
 @Component({
   selector: 'app-shopping-list',
@@ -10,28 +15,33 @@ import { LoggingService } from '../loging.service';
   styleUrls: ['./shopping-list.component.css'],
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
-  ingredients: Ingredient[];
+  ingredients: Observable<{ingredients : Ingredient[]}>;
   private igChangeSub: Subscription;
 
   constructor(
-    private shoppingService: ShoppingListService,
-    private loggingService: LoggingService
+
+    private loggingService: LoggingService,
+    private store : Store<fromApp.AppState>
   ) {}
 
   ngOnInit() {
-    this.ingredients = this.shoppingService.getIngredients();
-    this.igChangeSub = this.shoppingService.ingredientsChanged.subscribe(
-      (ingredients: Ingredient[]) => {
-        this.ingredients = ingredients;
-      }
-    );
+    this.ingredients = this.store.select('shoppingList');
+
+    // this.ingredients = this.shoppingService.getIngredients();
+    // this.igChangeSub = this.shoppingService.ingredientsChanged.subscribe(
+    //   (ingredients: Ingredient[]) => {
+    //     this.ingredients = ingredients;
+    //   }
+    // );
 
     this.loggingService.printLog('Hello from ShoppingListComponent ngOnInit');
   }
   onEditItem(index: number) {
-    this.shoppingService.startedEditing.next(index);
+    //this.shoppingService.startedEditing.next(index);
+    this.store.dispatch(new ShoppingListActions.StartEdit(index));
+
   }
   ngOnDestroy(): void {
-    this.igChangeSub.unsubscribe();
+    //this.igChangeSub.unsubscribe();
   }
 }
